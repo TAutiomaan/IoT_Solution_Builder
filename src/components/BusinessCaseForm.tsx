@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
-import type { BusinessCase } from '../lib/supabase';
+import type { BusinessCase } from '../types/businessCase';
+import { BusinessUnderstanding } from './form-sections/BusinessUnderstanding';
+import { OperationalContext } from './form-sections/OperationalContext';
+import { DevicesEdge } from './form-sections/DevicesEdge';
+import { ConnectivityRequirements } from './form-sections/ConnectivityRequirements';
+import { CloudDataPlatform } from './form-sections/CloudDataPlatform';
+import { SecurityCompliance } from './form-sections/SecurityCompliance';
+import { ScalabilityPerformance } from './form-sections/ScalabilityPerformance';
+import { ProjectRequirements } from './form-sections/ProjectRequirements';
+import { StrategicConsiderations } from './form-sections/StrategicConsiderations';
 
 interface BusinessCaseFormProps {
   onSubmit: (data: BusinessCase) => void;
@@ -37,56 +46,68 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
       case 1:
         return formData.title && formData.industry && formData.business_problem;
       case 2:
-        return formData.scale && formData.devices_count && formData.data_volume;
+        return true;
       case 3:
-        return formData.latency_requirements;
+        return true;
+      case 4:
+        return formData.scale && formData.devices_count;
+      case 5:
+        return true;
+      case 6:
+        return true;
+      case 7:
+        return formData.data_volume && formData.latency_requirements;
+      case 8:
+        return true;
+      case 9:
+        return true;
+      case 10:
+        return true;
       default:
         return true;
     }
   };
 
+  const stepLabels = [
+    'Overview',
+    'Business Context',
+    'Operations',
+    'Devices',
+    'Connectivity',
+    'Cloud & Data',
+    'Performance',
+    'Project Details',
+    'Strategy',
+    'Review'
+  ];
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
-          {[1, 2, 3, 4].map((s) => (
-            <div key={s} className="flex items-center flex-1">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors ${
-                  s === step
-                    ? 'bg-blue-600 text-white'
-                    : s < step
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-500'
-                }`}
-              >
-                {s}
-              </div>
-              {s < 4 && (
-                <div
-                  className={`h-1 flex-1 mx-2 transition-colors ${
-                    s < step ? 'bg-green-500' : 'bg-gray-200'
-                  }`}
-                />
-              )}
-            </div>
-          ))}
+          <div className="text-sm text-gray-600">
+            Step {step} of {stepLabels.length}
+          </div>
+          <div className="text-sm font-medium text-blue-600">
+            {stepLabels[step - 1]}
+          </div>
         </div>
-        <div className="flex justify-between text-sm text-gray-600 mt-2">
-          <span>Problem</span>
-          <span>Technical</span>
-          <span>Requirements</span>
-          <span>Additional</span>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(step / stepLabels.length) * 100}%` }}
+          />
         </div>
       </div>
 
       {step === 1 && (
         <div className="space-y-5">
-          <h2 className="text-2xl font-bold text-gray-800">Business Problem</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Project Overview</h2>
+          <p className="text-gray-600">Let's start with the basics of your IoT project</p>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Project Title
+              Project Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -100,7 +121,7 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Industry
+              Industry <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.industry}
@@ -123,7 +144,7 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Business Problem Description
+              Business Problem Description <span className="text-red-500">*</span>
             </label>
             <textarea
               value={formData.business_problem}
@@ -137,13 +158,16 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
         </div>
       )}
 
-      {step === 2 && (
+      {step === 2 && <BusinessUnderstanding formData={formData} updateField={updateField} />}
+      {step === 3 && <OperationalContext formData={formData} updateField={updateField} />}
+      {step === 4 && (
         <div className="space-y-5">
           <h2 className="text-2xl font-bold text-gray-800">Technical Specifications</h2>
+          <p className="text-gray-600">Define the scale and device requirements</p>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Project Scale
+              Project Scale <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.scale}
@@ -162,7 +186,7 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Number of Devices
+              Number of Devices <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -174,9 +198,20 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
             />
           </div>
 
+          <DevicesEdge formData={formData} updateField={updateField} />
+        </div>
+      )}
+
+      {step === 5 && <ConnectivityRequirements formData={formData} updateField={updateField} />}
+      {step === 6 && <CloudDataPlatform formData={formData} updateField={updateField} />}
+      {step === 7 && (
+        <div className="space-y-5">
+          <h2 className="text-2xl font-bold text-gray-800">Performance & Security</h2>
+          <p className="text-gray-600">Define data volume, latency, and security requirements</p>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Expected Data Volume
+              Expected Data Volume <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.data_volume}
@@ -191,16 +226,10 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
               <option value="Very High (> 1 TB/day)">Very High (&gt; 1 TB/day)</option>
             </select>
           </div>
-        </div>
-      )}
-
-      {step === 3 && (
-        <div className="space-y-5">
-          <h2 className="text-2xl font-bold text-gray-800">Performance Requirements</h2>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Latency Requirements
+              Latency Requirements <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.latency_requirements}
@@ -217,39 +246,16 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Security & Compliance Requirements
-            </label>
-            <textarea
-              value={formData.security_requirements}
-              onChange={(e) => updateField('security_requirements', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              rows={3}
-              placeholder="e.g., HIPAA compliance, end-to-end encryption, ISO 27001..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Geographic Scope
-            </label>
-            <input
-              type="text"
-              value={formData.geographic_scope}
-              onChange={(e) => updateField('geographic_scope', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="e.g., Single location, Regional, Global"
-            />
-          </div>
+          <SecurityCompliance formData={formData} updateField={updateField} />
+          <ScalabilityPerformance formData={formData} updateField={updateField} />
         </div>
       )}
 
-      {step === 4 && (
+      {step === 8 && (
         <div className="space-y-5">
-          <h2 className="text-2xl font-bold text-gray-800">Additional Information</h2>
+          <ProjectRequirements formData={formData} updateField={updateField} />
 
-          <div>
+          <div className="mt-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Budget Range
             </label>
@@ -281,9 +287,65 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
             />
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
-              Review your information and click "Generate Solution" to receive AI-powered IoT architecture recommendations.
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Geographic Scope
+            </label>
+            <input
+              type="text"
+              value={formData.geographic_scope}
+              onChange={(e) => updateField('geographic_scope', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g., Single location, Regional, Global"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Security Requirements (Legacy)
+            </label>
+            <textarea
+              value={formData.security_requirements}
+              onChange={(e) => updateField('security_requirements', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows={3}
+              placeholder="e.g., HIPAA compliance, end-to-end encryption, ISO 27001..."
+            />
+          </div>
+        </div>
+      )}
+
+      {step === 9 && <StrategicConsiderations formData={formData} updateField={updateField} />}
+
+      {step === 10 && (
+        <div className="space-y-5">
+          <h2 className="text-2xl font-bold text-gray-800">Review & Submit</h2>
+          <p className="text-gray-600">Review your information before generating the IoT solution</p>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-3">
+            <div>
+              <span className="font-semibold text-gray-700">Project:</span> {formData.title}
+            </div>
+            <div>
+              <span className="font-semibold text-gray-700">Industry:</span> {formData.industry}
+            </div>
+            <div>
+              <span className="font-semibold text-gray-700">Scale:</span> {formData.scale}
+            </div>
+            <div>
+              <span className="font-semibold text-gray-700">Devices:</span> {formData.devices_count}
+            </div>
+            <div>
+              <span className="font-semibold text-gray-700">Data Volume:</span> {formData.data_volume}
+            </div>
+            <div>
+              <span className="font-semibold text-gray-700">Latency:</span> {formData.latency_requirements}
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-6">
+            <p className="text-sm text-gray-800">
+              Click "Generate Solution" to receive comprehensive AI-powered IoT architecture recommendations tailored to your specific requirements.
             </p>
           </div>
         </div>
@@ -300,7 +362,7 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
           Previous
         </button>
 
-        {step < 4 ? (
+        {step < stepLabels.length ? (
           <button
             type="button"
             onClick={() => setStep((s) => s + 1)}

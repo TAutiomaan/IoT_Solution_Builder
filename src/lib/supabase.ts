@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { BusinessCase } from '../types/businessCase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -9,21 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export interface BusinessCase {
-  id?: string;
-  title: string;
-  industry: string;
-  business_problem: string;
-  scale: string;
-  devices_count: string;
-  data_volume: string;
-  latency_requirements: string;
-  budget_range?: string;
-  security_requirements?: string;
-  integration_needs?: string;
-  geographic_scope?: string;
-  created_at?: string;
-}
+export type { BusinessCase };
 
 export interface SolutionRecommendation {
   id?: string;
