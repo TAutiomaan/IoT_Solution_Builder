@@ -1,4 +1,6 @@
 import type { BusinessCase } from '../../types/businessCase';
+import { FieldSuggestions } from '../FieldSuggestions';
+import { fieldSuggestions } from '../../data/exampleData';
 
 interface ConnectivityRequirementsProps {
   formData: BusinessCase;
@@ -24,6 +26,7 @@ export function ConnectivityRequirements({ formData, updateField }: Connectivity
           rows={2}
           placeholder="e.g., Wi-Fi, LTE/5G, LoRaWAN, Zigbee, Ethernet, satellite..."
         />
+        <FieldSuggestions suggestions={fieldSuggestions.network_technologies || []} />
       </div>
 
       <div>

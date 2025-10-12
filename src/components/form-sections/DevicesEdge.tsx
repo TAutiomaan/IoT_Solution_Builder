@@ -1,4 +1,6 @@
 import type { BusinessCase } from '../../types/businessCase';
+import { FieldSuggestions } from '../FieldSuggestions';
+import { fieldSuggestions } from '../../data/exampleData';
 
 interface DevicesEdgeProps {
   formData: BusinessCase;
@@ -24,6 +26,7 @@ export function DevicesEdge({ formData, updateField }: DevicesEdgeProps) {
           rows={2}
           placeholder="e.g., Sensors, actuators, gateways, vehicles, machines..."
         />
+        <FieldSuggestions suggestions={fieldSuggestions.device_types || []} />
       </div>
 
       <div>
@@ -89,6 +92,7 @@ export function DevicesEdge({ formData, updateField }: DevicesEdgeProps) {
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="e.g., Battery-powered, mains, energy harvesting..."
         />
+        <FieldSuggestions suggestions={fieldSuggestions.power_constraints || []} />
       </div>
 
       <div>

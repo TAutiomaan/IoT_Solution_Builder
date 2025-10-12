@@ -1,4 +1,6 @@
 import type { BusinessCase } from '../../types/businessCase';
+import { FieldSuggestions } from '../FieldSuggestions';
+import { fieldSuggestions } from '../../data/exampleData';
 
 interface CloudDataPlatformProps {
   formData: BusinessCase;
@@ -24,6 +26,7 @@ export function CloudDataPlatform({ formData, updateField }: CloudDataPlatformPr
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="e.g., Cloud, on-premises, hybrid..."
         />
+        <FieldSuggestions suggestions={fieldSuggestions.data_location || []} />
       </div>
 
       <div>
@@ -37,6 +40,7 @@ export function CloudDataPlatform({ formData, updateField }: CloudDataPlatformPr
           rows={2}
           placeholder="e.g., Real-time analytics, predictive maintenance, batch processing..."
         />
+        <FieldSuggestions suggestions={fieldSuggestions.analytics_capabilities || []} />
       </div>
 
       <div>

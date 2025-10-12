@@ -45,7 +45,7 @@ Deno.serve(async (req: Request) => {
       return nonEmptyFields.length > 0 ? `\n${title}:\n${nonEmptyFields.join('\n')}` : '';
     };
 
-    const prompt = `You are an expert IoT architect. Analyze the following comprehensive business case and provide a detailed IoT solution recommendation.
+    const prompt = `You are an expert IoT solutions architect. Analyze this comprehensive business case and provide 3 DISTINCT solution options with detailed comparison.
 
 Business Case:
 - Title: ${businessCase.title}
@@ -135,70 +135,60 @@ ${buildPromptSection('Strategic Considerations', {
   'Incident Response': businessCase.incident_response,
 })}
 
-Based on this comprehensive information, provide a detailed solution recommendation in the following JSON format:
+Provide 3 DISTINCT solution options in this JSON format:
 {
-  "architecture_summary": "High-level overview of the recommended architecture (3-4 paragraphs). Address the specific business context, operational requirements, and strategic considerations mentioned.",
-  "technologies": [
+  "architecture_summary": "High-level overview comparing all 3 approaches (2-3 paragraphs)",
+  "solution_options": [
     {
-      "category": "Device Layer",
-      "name": "Specific technology name",
-      "purpose": "Why this technology is recommended based on the requirements"
-    },
-    {
-      "category": "Connectivity",
-      "name": "Specific technology name",
-      "purpose": "Why this technology is recommended"
-    },
-    {
-      "category": "Edge Computing",
-      "name": "Specific technology name",
-      "purpose": "Why this technology is recommended"
-    },
-    {
-      "category": "Data Ingestion",
-      "name": "Specific technology name",
-      "purpose": "Why this technology is recommended"
-    },
-    {
-      "category": "Data Storage",
-      "name": "Specific technology name",
-      "purpose": "Why this technology is recommended"
-    },
-    {
-      "category": "Analytics & Processing",
-      "name": "Specific technology name",
-      "purpose": "Why this technology is recommended"
-    },
-    {
-      "category": "Application Layer",
-      "name": "Specific technology name",
-      "purpose": "Why this technology is recommended"
-    },
-    {
-      "category": "Security",
-      "name": "Specific technology name",
-      "purpose": "Why this technology is recommended"
-    },
-    {
-      "category": "Device Management",
-      "name": "Specific technology name",
-      "purpose": "Why this technology is recommended"
+      "name": "Solution name (e.g., Enterprise Cloud-Native Solution, Hybrid Edge-Cloud Solution, Cost-Optimized Solution)",
+      "description": "2-sentence description of this approach",
+      "architecture_approach": "Detailed architecture description (2-3 paragraphs)",
+      "technologies": {
+        "sensors": [{"name": "Specific sensor/device", "specs": "Key specifications", "rationale": "Why chosen"}],
+        "connectivity": [{"name": "Network tech", "protocol": "Protocol (MQTT, CoAP, etc.)", "rationale": "Why chosen"}],
+        "edge_computing": [{"name": "Edge platform/gateway", "capabilities": "What it does", "rationale": "Why needed"}],
+        "cloud_platform": [{"name": "Cloud provider/service", "services": "Specific services used", "rationale": "Why chosen"}],
+        "data_storage": [{"name": "Database/storage", "type": "Time-series/NoSQL/etc.", "rationale": "Why chosen"}],
+        "data_processing": [{"name": "Processing engine", "use_case": "What it handles", "rationale": "Why chosen"}],
+        "analytics_ml": [{"name": "Analytics tool/platform", "capabilities": "What it enables", "rationale": "Why chosen"}],
+        "security": [{"name": "Security solution", "coverage": "What it secures", "rationale": "Why necessary"}],
+        "device_management": [{"name": "MDM/DM platform", "features": "Key features", "rationale": "Why needed"}]
+      },
+      "pros": ["Advantage 1", "Advantage 2", "Advantage 3"],
+      "cons": ["Limitation 1", "Limitation 2", "Limitation 3"],
+      "cost_breakdown": {
+        "initial_capex": "Hardware, licenses, setup costs",
+        "annual_opex": "Cloud, connectivity, maintenance costs",
+        "total_3_year_tco": "Total cost of ownership estimate"
+      },
+      "implementation_complexity": "Low/Medium/High with explanation",
+      "deployment_timeline": "Realistic timeline with phases",
+      "best_for": "Ideal use cases and requirements"
     }
   ],
-  "estimated_cost": "Detailed cost estimate with breakdown (CAPEX and OPEX if budget information provided)",
-  "implementation_timeline": "Realistic timeline estimate with phases (align with any timeline constraints mentioned)",
-  "full_recommendation": "Comprehensive explanation (5-8 paragraphs) covering: implementation approach, best practices, addressing specific concerns raised (security, scalability, sustainability), risk mitigation strategies, and success factors. Reference specific requirements and constraints mentioned in the business case."
+  "comparison_matrix": {
+    "sensor_layer": "Comparison of sensor choices across solutions",
+    "connectivity_layer": "Comparison of network/protocol choices",
+    "edge_layer": "Comparison of edge computing approaches",
+    "cloud_platform": "Comparison of cloud platform choices",
+    "data_storage": "Comparison of storage solutions",
+    "data_processing": "Comparison of processing approaches",
+    "analytics": "Comparison of analytics capabilities",
+    "security": "Comparison of security implementations",
+    "scalability": "Comparison of scalability approaches",
+    "cost": "Cost comparison with breakdown",
+    "complexity": "Implementation complexity comparison",
+    "vendor_lockin": "Vendor lock-in risk comparison"
+  },
+  "recommendation": "Which solution to choose and why (3-4 paragraphs addressing specific requirements)"
 }
 
-Be specific with technology names (e.g., AWS IoT Core, Azure IoT Hub, Google Cloud IoT Core, MQTT, LoRaWAN, Sigfox, NB-IoT, InfluxDB, TimescaleDB, Apache Kafka, Grafana, etc.).
-
-Tailor the recommendation to:
-- The specific industry and use case
-- The operational environment and constraints mentioned
-- Any compliance or regulatory requirements stated
-- Budget and timeline constraints
-- Strategic considerations like sustainability, vendor lock-in tolerance, and data strategy
-- Risk scenarios and contingency planning needs mentioned`;
+IMPORTANT:
+- Make solutions DISTINCT (e.g., different cloud providers, different approaches like cloud-heavy vs edge-heavy)
+- Use REAL technology names (AWS IoT Core, Azure IoT Hub, LoRaWAN, MQTT, InfluxDB, Kafka, etc.)
+- Tailor to the specific industry, requirements, and constraints
+- Provide realistic cost estimates
+- Consider all stated requirements (budget, timeline, compliance, sustainability, etc.)`;
 
     const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -211,7 +201,7 @@ Tailor the recommendation to:
         messages: [
           {
             role: "system",
-            content: "You are an expert IoT solutions architect with 15+ years of experience across multiple industries. You have deep knowledge of IoT technologies, cloud platforms, edge computing, network protocols, security standards, and industry-specific requirements. You provide practical, production-ready, and cost-effective recommendations that address both technical and business requirements. You consider regulatory compliance, sustainability, risk management, and long-term strategic planning in your recommendations."
+            content: "You are an expert IoT solutions architect with 15+ years of experience. You provide multiple distinct solution options with detailed technology comparisons. You use real, specific technology names and provide practical, production-ready recommendations. You consider cost, complexity, scalability, security, and business requirements in your recommendations."
           },
           {
             role: "user",
@@ -219,6 +209,7 @@ Tailor the recommendation to:
           }
         ],
         temperature: 0.7,
+        max_tokens: 4000,
         response_format: { type: "json_object" }
       }),
     });
@@ -229,14 +220,24 @@ Tailor the recommendation to:
     }
 
     const openAIData = await openAIResponse.json();
-    const recommendation = JSON.parse(openAIData.choices[0].message.content);
+    const aiResponse = JSON.parse(openAIData.choices[0].message.content);
 
     const result = {
-      recommendation: recommendation.full_recommendation || recommendation.recommendation || "No recommendation provided",
-      technologies: recommendation.technologies || [],
-      architecture_summary: recommendation.architecture_summary || "",
-      estimated_cost: recommendation.estimated_cost || "",
-      implementation_timeline: recommendation.implementation_timeline || "",
+      recommendation: aiResponse.recommendation || aiResponse.full_recommendation || "No recommendation provided",
+      technologies: aiResponse.solution_options?.[0]?.technologies ?
+        Object.entries(aiResponse.solution_options[0].technologies).flatMap(([category, items]: [string, any]) =>
+          (Array.isArray(items) ? items : [items]).map((item: any) => ({
+            category,
+            name: item.name || 'N/A',
+            purpose: item.rationale || item.specs || 'N/A'
+          }))
+        ) : [],
+      architecture_summary: aiResponse.architecture_summary || "",
+      estimated_cost: aiResponse.solution_options?.[0]?.cost_breakdown ?
+        JSON.stringify(aiResponse.solution_options[0].cost_breakdown) : "",
+      implementation_timeline: aiResponse.solution_options?.[0]?.deployment_timeline || "",
+      solution_options: aiResponse.solution_options || [],
+      comparison_summary: aiResponse.comparison_matrix ? JSON.stringify(aiResponse.comparison_matrix) : ""
     };
 
     return new Response(

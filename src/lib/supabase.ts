@@ -24,5 +24,7 @@ export interface SolutionRecommendation {
   architecture_summary: string;
   estimated_cost: string;
   implementation_timeline: string;
+  solution_options?: any[];
+  comparison_summary?: string;
   created_at?: string;
 }

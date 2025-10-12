@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Sparkles, FlaskConical } from 'lucide-react';
 import type { BusinessCase } from '../types/businessCase';
 import { BusinessUnderstanding } from './form-sections/BusinessUnderstanding';
 import { OperationalContext } from './form-sections/OperationalContext';
@@ -10,27 +10,34 @@ import { SecurityCompliance } from './form-sections/SecurityCompliance';
 import { ScalabilityPerformance } from './form-sections/ScalabilityPerformance';
 import { ProjectRequirements } from './form-sections/ProjectRequirements';
 import { StrategicConsiderations } from './form-sections/StrategicConsiderations';
+import { exampleData } from '../data/exampleData';
 
 interface BusinessCaseFormProps {
   onSubmit: (data: BusinessCase) => void;
   isLoading: boolean;
 }
 
+const emptyFormData: BusinessCase = {
+  title: '',
+  industry: '',
+  business_problem: '',
+  scale: '',
+  devices_count: '',
+  data_volume: '',
+  latency_requirements: '',
+  budget_range: '',
+  security_requirements: '',
+  integration_needs: '',
+  geographic_scope: '',
+};
+
 export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps) {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<BusinessCase>({
-    title: '',
-    industry: '',
-    business_problem: '',
-    scale: '',
-    devices_count: '',
-    data_volume: '',
-    latency_requirements: '',
-    budget_range: '',
-    security_requirements: '',
-    integration_needs: '',
-    geographic_scope: '',
-  });
+  const [formData, setFormData] = useState<BusinessCase>(emptyFormData);
+
+  const loadExampleData = () => {
+    setFormData(exampleData);
+  };
 
   const updateField = (field: keyof BusinessCase, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -84,10 +91,20 @@ export function BusinessCaseForm({ onSubmit, isLoading }: BusinessCaseFormProps)
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-4">
           <div className="text-sm text-gray-600">
             Step {step} of {stepLabels.length}
           </div>
+          <button
+            type="button"
+            onClick={loadExampleData}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 flex items-center gap-2 transition-colors"
+          >
+            <FlaskConical size={16} />
+            Load Example
+          </button>
+        </div>
+        <div className="flex items-center justify-between mb-2">
           <div className="text-sm font-medium text-blue-600">
             {stepLabels[step - 1]}
           </div>

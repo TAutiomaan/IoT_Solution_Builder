@@ -1,4 +1,6 @@
 import type { BusinessCase } from '../../types/businessCase';
+import { FieldSuggestions } from '../FieldSuggestions';
+import { fieldSuggestions } from '../../data/exampleData';
 
 interface SecurityComplianceProps {
   formData: BusinessCase;
@@ -24,6 +26,7 @@ export function SecurityCompliance({ formData, updateField }: SecurityCompliance
           rows={2}
           placeholder="e.g., GDPR, HIPAA, ISO 27001, SOC 2..."
         />
+        <FieldSuggestions suggestions={fieldSuggestions.compliance_standards || []} />
       </div>
 
       <div>

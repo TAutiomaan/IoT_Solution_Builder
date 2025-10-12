@@ -1,4 +1,6 @@
 import type { BusinessCase } from '../../types/businessCase';
+import { FieldSuggestions } from '../FieldSuggestions';
+import { fieldSuggestions } from '../../data/exampleData';
 
 interface BusinessUnderstandingProps {
   formData: BusinessCase;
@@ -24,6 +26,7 @@ export function BusinessUnderstanding({ formData, updateField }: BusinessUnderst
           rows={3}
           placeholder="e.g., Cost reduction, new revenue streams, safety improvement..."
         />
+        <FieldSuggestions suggestions={fieldSuggestions.business_outcomes || []} />
       </div>
 
       <div>
@@ -37,6 +40,7 @@ export function BusinessUnderstanding({ formData, updateField }: BusinessUnderst
           rows={2}
           placeholder="Who are the key stakeholders and end-users?"
         />
+        <FieldSuggestions suggestions={fieldSuggestions.stakeholders || []} />
       </div>
 
       <div>
@@ -50,6 +54,7 @@ export function BusinessUnderstanding({ formData, updateField }: BusinessUnderst
           rows={2}
           placeholder="What are the key success metrics or KPIs for this project?"
         />
+        <FieldSuggestions suggestions={fieldSuggestions.success_metrics || []} />
       </div>
 
       <div>

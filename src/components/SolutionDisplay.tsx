@@ -1,5 +1,6 @@
 import { CheckCircle, Clock, DollarSign, Layers, ArrowLeft } from 'lucide-react';
 import type { SolutionRecommendation } from '../lib/supabase';
+import { SolutionComparison } from './SolutionComparison';
 
 interface SolutionDisplayProps {
   solution: SolutionRecommendation;
@@ -7,6 +8,8 @@ interface SolutionDisplayProps {
 }
 
 export function SolutionDisplay({ solution, onReset }: SolutionDisplayProps) {
+  const hasSolutionOptions = solution.solution_options && Array.isArray(solution.solution_options) && solution.solution_options.length > 0;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -22,6 +25,15 @@ export function SolutionDisplay({ solution, onReset }: SolutionDisplayProps) {
           New Analysis
         </button>
       </div>
+
+      {hasSolutionOptions ? (
+        <SolutionComparison
+          solutions={solution.solution_options}
+          comparisonMatrix={solution.comparison_summary}
+          recommendation={solution.recommendation}
+        />
+      ) : (
+        <div className="space-y-6">{/* Legacy single solution view */}
 
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
         <h3 className="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -92,6 +104,8 @@ export function SolutionDisplay({ solution, onReset }: SolutionDisplayProps) {
           {solution.recommendation}
         </div>
       </div>
+        </div>
+      )}
     </div>
   );
 }
