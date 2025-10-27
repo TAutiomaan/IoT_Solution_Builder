@@ -1,84 +1,69 @@
+import React from 'react';
+import { Cloud } from 'lucide-react';
 import type { BusinessCase } from '../../types/businessCase';
-import { FieldSuggestions } from '../FieldSuggestions';
-import { fieldSuggestions } from '../../data/exampleData';
 
-interface CloudDataPlatformProps {
-  formData: BusinessCase;
-  updateField: (field: keyof BusinessCase, value: string) => void;
+interface Props {
+  formData: Partial<BusinessCase>;
+  onChange: (field: keyof BusinessCase, value: string) => void;
 }
 
-export function CloudDataPlatform({ formData, updateField }: CloudDataPlatformProps) {
+export default function CloudDataPlatform({ formData, onChange }: Props) {
   return (
-    <div className="space-y-5">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Cloud & Data Platform</h3>
-        <p className="text-sm text-gray-600 mb-4">Specify cloud infrastructure and data processing requirements</p>
+    <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+      <div className="flex items-center mb-4">
+        <Cloud className="w-6 h-6 text-blue-600 mr-2" />
+        <h2 className="text-2xl font-semibold text-slate-800">Cloud & Data Platform</h2>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Data Storage & Processing Location
-        </label>
-        <input
-          type="text"
-          value={formData.data_location}
-          onChange={(e) => updateField('data_location', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="e.g., Cloud, on-premises, hybrid..."
-        />
-        <FieldSuggestions suggestions={fieldSuggestions.data_location || []} />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Analytics & AI Capabilities
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Data Storage Needs
         </label>
         <textarea
-          value={formData.analytics_capabilities}
-          onChange={(e) => updateField('analytics_capabilities', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          rows={2}
-          placeholder="e.g., Real-time analytics, predictive maintenance, batch processing..."
+          value={formData.data_storage_needs || ''}
+          onChange={(e) => onChange('data_storage_needs', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          rows={3}
+          placeholder="Hot/cold storage, retention policies, etc."
         />
-        <FieldSuggestions suggestions={fieldSuggestions.analytics_capabilities || []} />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Enterprise System Integration
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Analytics Requirements
         </label>
         <textarea
-          value={formData.enterprise_integration}
-          onChange={(e) => updateField('enterprise_integration', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          rows={2}
-          placeholder="e.g., ERP (SAP, Oracle), CRM (Salesforce), SCADA, MES systems..."
+          value={formData.analytics_requirements || ''}
+          onChange={(e) => onChange('analytics_requirements', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          rows={3}
+          placeholder="Real-time analytics, ML/AI needs, batch processing, etc."
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          API & Data Exchange Requirements
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Integration with Existing Systems
         </label>
-        <input
-          type="text"
-          value={formData.api_requirements}
-          onChange={(e) => updateField('api_requirements', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Expected APIs or data exchange mechanisms..."
+        <textarea
+          value={formData.integration_systems || ''}
+          onChange={(e) => onChange('integration_systems', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          rows={3}
+          placeholder="ERP, CRM, SCADA, or other systems to integrate with"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Data Retention & Archival Policies
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Visualization & Reporting Needs
         </label>
-        <input
-          type="text"
-          value={formData.data_retention}
-          onChange={(e) => updateField('data_retention', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="e.g., 7 years hot storage, 10 years archival..."
+        <textarea
+          value={formData.visualization_needs || ''}
+          onChange={(e) => onChange('visualization_needs', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          rows={3}
+          placeholder="Dashboards, reports, mobile apps, etc."
         />
       </div>
     </div>

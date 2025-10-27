@@ -1,111 +1,107 @@
-import { CheckCircle, Clock, DollarSign, Layers, ArrowLeft } from 'lucide-react';
+import { CheckCircle, DollarSign, Clock, Layers, ArrowLeft, GitCompare } from 'lucide-react';
 import type { SolutionRecommendation } from '../lib/supabase';
-import { SolutionComparison } from './SolutionComparison';
+import type { BusinessCase } from '../types/businessCase';
 
-interface SolutionDisplayProps {
+interface Props {
   solution: SolutionRecommendation;
-  onReset: () => void;
+  businessCase: BusinessCase | null;
+  onNewCase: () => void;
+  onShowComparison: () => void;
 }
 
-export function SolutionDisplay({ solution, onReset }: SolutionDisplayProps) {
-  const hasSolutionOptions = solution.solution_options && Array.isArray(solution.solution_options) && solution.solution_options.length > 0;
+export default function SolutionDisplay({ solution, businessCase, onNewCase, onShowComparison }: Props) {
+  const hasSolutionOptions = solution.solution_options && solution.solution_options.length > 0;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-          <CheckCircle className="text-green-500" size={32} />
-          Solution Generated
-        </h2>
         <button
-          onClick={onReset}
-          className="px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+          onClick={onNewCase}
+          className="flex items-center text-blue-600 hover:text-blue-700 font-medium"
         >
-          <ArrowLeft size={18} />
-          New Analysis
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Create New Case
         </button>
-      </div>
-
-      {hasSolutionOptions ? (
-        <SolutionComparison
-          solutions={solution.solution_options}
-          comparisonMatrix={solution.comparison_summary}
-          recommendation={solution.recommendation}
-        />
-      ) : (
-        <div className="space-y-6">{/* Legacy single solution view */}
-
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-        <h3 className="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
-          <Layers size={24} className="text-blue-600" />
-          Architecture Summary
-        </h3>
-        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-          {solution.architecture_summary || 'No architecture summary provided.'}
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        {solution.estimated_cost && (
-          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-              <DollarSign size={22} className="text-green-600" />
-              Estimated Cost
-            </h3>
-            <p className="text-gray-700">{solution.estimated_cost}</p>
-          </div>
-        )}
-
-        {solution.implementation_timeline && (
-          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-              <Clock size={22} className="text-blue-600" />
-              Implementation Timeline
-            </h3>
-            <p className="text-gray-700">{solution.implementation_timeline}</p>
-          </div>
+        {hasSolutionOptions && (
+          <button
+            onClick={onShowComparison}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <GitCompare className="w-5 h-5 mr-2" />
+            Compare Solutions
+          </button>
         )}
       </div>
 
-      {solution.technologies && solution.technologies.length > 0 && (
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
-            Recommended Technologies
+      {businessCase && (
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-xl font-semibold text-slate-800 mb-4">
+            {businessCase.project_name}
           </h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            {solution.technologies.map((tech, index) => (
-              <div
-                key={index}
-                className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
-                      {tech.category}
-                    </div>
-                    <h4 className="font-bold text-gray-800 mb-1">{tech.name}</h4>
-                    <p className="text-sm text-gray-600">{tech.purpose}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="font-medium text-slate-600">Industry:</span>
+              <span className="ml-2 text-slate-800">{businessCase.industry}</span>
+            </div>
+            <div>
+              <span className="font-medium text-slate-600">Budget:</span>
+              <span className="ml-2 text-slate-800">{businessCase.budget_range}</span>
+            </div>
           </div>
         </div>
       )}
 
-      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">
-          Full Recommendation
-        </h3>
-        <div className="prose max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
-          {solution.recommendation}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-6 border border-blue-100">
+        <div className="flex items-center mb-4">
+          <CheckCircle className="w-6 h-6 text-green-600 mr-2" />
+          <h2 className="text-2xl font-semibold text-slate-800">Recommended Solution</h2>
+        </div>
+        <div className="prose prose-slate max-w-none">
+          <p className="text-slate-700 whitespace-pre-wrap">{solution.recommendation}</p>
         </div>
       </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center mb-4">
+          <Layers className="w-6 h-6 text-blue-600 mr-2" />
+          <h3 className="text-xl font-semibold text-slate-800">Technology Stack</h3>
         </div>
-      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {solution.technologies.map((tech, index) => (
+            <div key={index} className="border border-slate-200 rounded-lg p-4">
+              <div className="font-semibold text-slate-800 mb-1">{tech.category}</div>
+              <div className="text-blue-600 font-medium mb-2">{tech.name}</div>
+              <div className="text-sm text-slate-600">{tech.purpose}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center mb-4">
+          <Layers className="w-6 h-6 text-purple-600 mr-2" />
+          <h3 className="text-xl font-semibold text-slate-800">Architecture Overview</h3>
+        </div>
+        <p className="text-slate-700 whitespace-pre-wrap">{solution.architecture_summary}</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center mb-3">
+            <DollarSign className="w-6 h-6 text-green-600 mr-2" />
+            <h3 className="text-xl font-semibold text-slate-800">Estimated Cost</h3>
+          </div>
+          <p className="text-slate-700">{solution.estimated_cost}</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center mb-3">
+            <Clock className="w-6 h-6 text-orange-600 mr-2" />
+            <h3 className="text-xl font-semibold text-slate-800">Implementation Timeline</h3>
+          </div>
+          <p className="text-slate-700">{solution.implementation_timeline}</p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,98 +1,84 @@
+import React from 'react';
+import { Building2 } from 'lucide-react';
 import type { BusinessCase } from '../../types/businessCase';
-import { FieldSuggestions } from '../FieldSuggestions';
-import { fieldSuggestions } from '../../data/exampleData';
+import FieldSuggestions from '../FieldSuggestions';
 
-interface BusinessUnderstandingProps {
-  formData: BusinessCase;
-  updateField: (field: keyof BusinessCase, value: string) => void;
+interface Props {
+  formData: Partial<BusinessCase>;
+  onChange: (field: keyof BusinessCase, value: string) => void;
 }
 
-export function BusinessUnderstanding({ formData, updateField }: BusinessUnderstandingProps) {
+export default function BusinessUnderstanding({ formData, onChange }: Props) {
   return (
-    <div className="space-y-5">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Business Understanding</h3>
-        <p className="text-sm text-gray-600 mb-4">Help us understand the business context and objectives</p>
+    <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+      <div className="flex items-center mb-4">
+        <Building2 className="w-6 h-6 text-blue-600 mr-2" />
+        <h2 className="text-2xl font-semibold text-slate-800">Business Understanding</h2>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Expected Business Outcomes
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Project Name *
+        </label>
+        <input
+          type="text"
+          value={formData.project_name || ''}
+          onChange={(e) => onChange('project_name', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="e.g., Smart Factory Initiative"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Industry *
+        </label>
+        <FieldSuggestions
+          field="industry"
+          value={formData.industry || ''}
+          onChange={(value) => onChange('industry', value)}
+          placeholder="e.g., Manufacturing"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Business Objectives *
         </label>
         <textarea
-          value={formData.business_outcomes}
-          onChange={(e) => updateField('business_outcomes', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={formData.business_objectives || ''}
+          onChange={(e) => onChange('business_objectives', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={3}
-          placeholder="e.g., Cost reduction, new revenue streams, safety improvement..."
+          placeholder="What are the primary business goals?"
+          required
         />
-        <FieldSuggestions suggestions={fieldSuggestions.business_outcomes || []} />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Key Stakeholders & End-Users
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Key Stakeholders
         </label>
         <textarea
-          value={formData.stakeholders}
-          onChange={(e) => updateField('stakeholders', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={formData.key_stakeholders || ''}
+          onChange={(e) => onChange('key_stakeholders', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={2}
-          placeholder="Who are the key stakeholders and end-users?"
+          placeholder="Who are the main stakeholders and decision-makers?"
         />
-        <FieldSuggestions suggestions={fieldSuggestions.stakeholders || []} />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Success Metrics / KPIs
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Success Metrics
         </label>
         <textarea
-          value={formData.success_metrics}
-          onChange={(e) => updateField('success_metrics', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={formData.success_metrics || ''}
+          onChange={(e) => onChange('success_metrics', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={2}
-          placeholder="What are the key success metrics or KPIs for this project?"
-        />
-        <FieldSuggestions suggestions={fieldSuggestions.success_metrics || []} />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Current Process & Pain Points
-        </label>
-        <textarea
-          value={formData.current_process}
-          onChange={(e) => updateField('current_process', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          rows={3}
-          placeholder="What is the current process or system in place? What are its pain points or inefficiencies?"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Market or Regulatory Drivers
-        </label>
-        <textarea
-          value={formData.market_drivers}
-          onChange={(e) => updateField('market_drivers', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          rows={2}
-          placeholder="Are there specific market or regulatory drivers for this IoT initiative?"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Expected Benefits (Short-term & Long-term)
-        </label>
-        <textarea
-          value={formData.expected_benefits}
-          onChange={(e) => updateField('expected_benefits', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          rows={3}
-          placeholder="What are the expected short-term and long-term benefits?"
+          placeholder="How will you measure project success?"
         />
       </div>
     </div>

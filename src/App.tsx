@@ -1,41 +1,67 @@
-import { useState } from 'react';
-import { Cpu, Zap } from 'lucide-react';
-import { BusinessCaseForm } from './components/BusinessCaseForm';
-import { SolutionDisplay } from './components/SolutionDisplay';
-import { CaseHistory } from './components/CaseHistory';
+import { useState, useEffect } from 'react';
+import { Lightbulb } from 'lucide-react';
+import BusinessCaseForm from './components/BusinessCaseForm';
+import SolutionDisplay from './components/SolutionDisplay';
+import CaseHistory from './components/CaseHistory';
+import SolutionComparison from './components/SolutionComparison';
 import { supabase } from './lib/supabase';
-import type { BusinessCase, SolutionRecommendation } from './lib/supabase';
-
-type AppState = 'form' | 'solution';
+import type { BusinessCase } from './types/businessCase';
+import type { SolutionRecommendation } from './lib/supabase';
 
 function App() {
-  const [state, setState] = useState<AppState>('form');
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentSolution, setCurrentSolution] = useState<SolutionRecommendation | null>(null);
+  const [currentCase, setCurrentCase] = useState<BusinessCase | null>(null);
+  const [solution, setSolution] = useState<SolutionRecommendation | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedCases, setSavedCases] = useState<BusinessCase[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
 
-  const handleSubmit = async (businessCase: BusinessCase) => {
-    setIsLoading(true);
+  useEffect(() => {
+    loadSavedCases();
+  }, []);
+
+  const loadSavedCases = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('business_cases')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setSavedCases(data || []);
+    } catch (err) {
+      console.error('Error loading cases:', err);
+    }
+  };
+
+  const handleSubmit = async (caseData: BusinessCase) => {
+    setLoading(true);
     setError(null);
+    setSolution(null);
+    setShowComparison(false);
 
     try {
-      const { data: savedCase, error: saveError } = await supabase
+      const { data: savedCase, error: caseError } = await supabase
         .from('business_cases')
-        .insert([businessCase])
+        .insert([caseData])
         .select()
         .single();
 
-      if (saveError) throw saveError;
+      if (caseError) throw caseError;
+      setCurrentCase(savedCase);
 
       const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-iot-solution`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(businessCase),
+        body: JSON.stringify({
+          businessCaseId: savedCase.id,
+          businessCase: savedCase
+        })
       });
 
       if (!response.ok) {
@@ -44,107 +70,141 @@ function App() {
       }
 
       const solutionData = await response.json();
+      setSolution(solutionData);
+      await loadSavedCases();
 
-      const solutionToSave: Omit<SolutionRecommendation, 'id' | 'created_at'> = {
-        business_case_id: savedCase.id!,
-        recommendation: solutionData.recommendation,
-        technologies: solutionData.technologies,
-        architecture_summary: solutionData.architecture_summary,
-        estimated_cost: solutionData.estimated_cost,
-        implementation_timeline: solutionData.implementation_timeline,
-      };
-
-      const { data: savedSolution, error: solutionError } = await supabase
-        .from('solution_recommendations')
-        .insert([solutionToSave])
-        .select()
-        .single();
-
-      if (solutionError) throw solutionError;
-
-      setCurrentSolution(savedSolution);
-      setState('solution');
     } catch (err) {
       console.error('Error:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred while generating the solution');
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleReset = () => {
-    setState('form');
-    setCurrentSolution(null);
+  const handleLoadCase = async (caseId: string) => {
+    setLoading(true);
     setError(null);
+    setShowComparison(false);
+
+    try {
+      const { data: caseData, error: caseError } = await supabase
+        .from('business_cases')
+        .select('*')
+        .eq('id', caseId)
+        .single();
+
+      if (caseError) throw caseError;
+      setCurrentCase(caseData);
+
+      const { data: solutionData, error: solutionError } = await supabase
+        .from('solution_recommendations')
+        .select('*')
+        .eq('business_case_id', caseId)
+        .single();
+
+      if (solutionError) throw solutionError;
+      setSolution(solutionData);
+
+    } catch (err) {
+      console.error('Error loading case:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load case');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSelectCase = (_caseData: BusinessCase, solution: SolutionRecommendation) => {
-    setCurrentSolution(solution);
-    setState('solution');
+  const handleDeleteCase = async (caseId: string) => {
+    try {
+      const { error: solutionError } = await supabase
+        .from('solution_recommendations')
+        .delete()
+        .eq('business_case_id', caseId);
+
+      if (solutionError) throw solutionError;
+
+      const { error: caseError } = await supabase
+        .from('business_cases')
+        .delete()
+        .eq('id', caseId);
+
+      if (caseError) throw caseError;
+
+      await loadSavedCases();
+
+      if (currentCase?.id === caseId) {
+        setCurrentCase(null);
+        setSolution(null);
+        setShowComparison(false);
+      }
+    } catch (err) {
+      console.error('Error deleting case:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete case');
+    }
+  };
+
+  const handleNewCase = () => {
+    setCurrentCase(null);
+    setSolution(null);
+    setError(null);
+    setShowComparison(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
-      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
-
-      <div className="relative">
-        <header className="bg-white border-b border-gray-200 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-                <Cpu className="text-white" size={28} />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  IoT Solution Finder
-                </h1>
-                <p className="text-gray-600 text-sm mt-1">
-                  AI-powered architecture recommendations for your IoT projects
-                </p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="container mx-auto px-4 py-8">
+        <header className="text-center mb-12">
+          <div className="flex items-center justify-center mb-4">
+            <Lightbulb className="w-12 h-12 text-blue-600 mr-3" />
+            <h1 className="text-4xl font-bold text-slate-800">IoT Solution Designer</h1>
           </div>
+          <p className="text-lg text-slate-600">
+            Define your business case and get AI-powered IoT solution recommendations
+          </p>
         </header>
 
-        {state === 'form' && <CaseHistory onSelectCase={handleSelectCase} />}
-
-        <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800 font-medium">Error: {error}</p>
-            </div>
-          )}
-
-          {state === 'form' ? (
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-3">
-                  <Zap className="text-blue-600" size={32} />
-                  <h2 className="text-2xl font-bold text-gray-800">
-                    Describe Your IoT Project
-                  </h2>
-                </div>
-                <p className="text-gray-600">
-                  Answer a few questions about your business needs, and we'll recommend the best IoT architecture and technology stack.
-                </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            {!solution ? (
+              <BusinessCaseForm
+                onSubmit={handleSubmit}
+                loading={loading}
+                initialData={currentCase || undefined}
+              />
+            ) : (
+              <div className="space-y-6">
+                {showComparison && solution.solution_options ? (
+                  <SolutionComparison
+                    options={solution.solution_options}
+                    summary={solution.comparison_summary || ''}
+                    onBack={() => setShowComparison(false)}
+                  />
+                ) : (
+                  <SolutionDisplay
+                    solution={solution}
+                    businessCase={currentCase}
+                    onNewCase={handleNewCase}
+                    onShowComparison={() => setShowComparison(true)}
+                  />
+                )}
               </div>
+            )}
 
-              <BusinessCaseForm onSubmit={handleSubmit} isLoading={isLoading} />
-            </div>
-          ) : currentSolution ? (
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
-              <SolutionDisplay solution={currentSolution} onReset={handleReset} />
-            </div>
-          ) : null}
-        </main>
-
-        <footer className="bg-white border-t border-gray-200 mt-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <p className="text-center text-gray-600 text-sm">
-              Powered by AI to help IoT architects make better technology decisions
-            </p>
+            {error && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-800">{error}</p>
+              </div>
+            )}
           </div>
-        </footer>
+
+          <div className="lg:col-span-1">
+            <CaseHistory
+              cases={savedCases}
+              onLoadCase={handleLoadCase}
+              onDeleteCase={handleDeleteCase}
+              currentCaseId={currentCase?.id}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

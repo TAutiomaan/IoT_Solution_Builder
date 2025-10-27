@@ -1,110 +1,68 @@
+import React from 'react';
+import { Cpu } from 'lucide-react';
 import type { BusinessCase } from '../../types/businessCase';
-import { FieldSuggestions } from '../FieldSuggestions';
-import { fieldSuggestions } from '../../data/exampleData';
+import FieldSuggestions from '../FieldSuggestions';
 
-interface DevicesEdgeProps {
-  formData: BusinessCase;
-  updateField: (field: keyof BusinessCase, value: string) => void;
+interface Props {
+  formData: Partial<BusinessCase>;
+  onChange: (field: keyof BusinessCase, value: string) => void;
 }
 
-export function DevicesEdge({ formData, updateField }: DevicesEdgeProps) {
+export default function DevicesEdge({ formData, onChange }: Props) {
   return (
-    <div className="space-y-5">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Devices & Edge Computing</h3>
-        <p className="text-sm text-gray-600 mb-4">Specify device requirements and edge capabilities</p>
+    <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+      <div className="flex items-center mb-4">
+        <Cpu className="w-6 h-6 text-blue-600 mr-2" />
+        <h2 className="text-2xl font-semibold text-slate-800">Devices & Edge</h2>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Device Types
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Sensor/Device Types *
+        </label>
+        <FieldSuggestions
+          field="sensorTypes"
+          value={formData.sensor_types || ''}
+          onChange={(value) => onChange('sensor_types', value)}
+          placeholder="e.g., Temperature sensors, GPS trackers"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Expected Device Count *
+        </label>
+        <FieldSuggestions
+          field="deviceCount"
+          value={formData.device_count || ''}
+          onChange={(value) => onChange('device_count', value)}
+          placeholder="e.g., 100-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Data Volume per Device
+        </label>
+        <input
+          type="text"
+          value={formData.data_volume || ''}
+          onChange={(e) => onChange('data_volume', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="e.g., 1KB per minute, 10MB per hour"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Edge Processing Requirements
         </label>
         <textarea
-          value={formData.device_types}
-          onChange={(e) => updateField('device_types', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          rows={2}
-          placeholder="e.g., Sensors, actuators, gateways, vehicles, machines..."
-        />
-        <FieldSuggestions suggestions={fieldSuggestions.device_types || []} />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Data Collection Specifications
-        </label>
-        <textarea
-          value={formData.data_collection_specs}
-          onChange={(e) => updateField('data_collection_specs', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          rows={2}
-          placeholder="Data type, frequency, format, precision required..."
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Data Transmission Frequency
-        </label>
-        <input
-          type="text"
-          value={formData.transmission_frequency}
-          onChange={(e) => updateField('transmission_frequency', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="e.g., Every second, every minute, hourly..."
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Real-time Processing Needs
-        </label>
-        <input
-          type="text"
-          value={formData.real_time_needs}
-          onChange={(e) => updateField('real_time_needs', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Latency or real-time processing requirements..."
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Edge Intelligence Level
-        </label>
-        <input
-          type="text"
-          value={formData.edge_intelligence}
-          onChange={(e) => updateField('edge_intelligence', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Level of device intelligence or edge computing needed..."
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Power Constraints
-        </label>
-        <input
-          type="text"
-          value={formData.power_constraints}
-          onChange={(e) => updateField('power_constraints', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="e.g., Battery-powered, mains, energy harvesting..."
-        />
-        <FieldSuggestions suggestions={fieldSuggestions.power_constraints || []} />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Device Management Approach
-        </label>
-        <textarea
-          value={formData.device_management}
-          onChange={(e) => updateField('device_management', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          rows={2}
-          placeholder="Device provisioning, OTA updates, remote management requirements..."
+          value={formData.edge_processing || ''}
+          onChange={(e) => onChange('edge_processing', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          rows={3}
+          placeholder="What processing needs to happen at the edge?"
         />
       </div>
     </div>

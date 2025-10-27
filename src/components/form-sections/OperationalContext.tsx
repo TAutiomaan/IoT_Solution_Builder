@@ -1,80 +1,69 @@
+import React from 'react';
+import { MapPin } from 'lucide-react';
 import type { BusinessCase } from '../../types/businessCase';
 
-interface OperationalContextProps {
-  formData: BusinessCase;
-  updateField: (field: keyof BusinessCase, value: string) => void;
+interface Props {
+  formData: Partial<BusinessCase>;
+  onChange: (field: keyof BusinessCase, value: string) => void;
 }
 
-export function OperationalContext({ formData, updateField }: OperationalContextProps) {
+export default function OperationalContext({ formData, onChange }: Props) {
   return (
-    <div className="space-y-5">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Operational Context</h3>
-        <p className="text-sm text-gray-600 mb-4">Tell us about the environment and operational conditions</p>
+    <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+      <div className="flex items-center mb-4">
+        <MapPin className="w-6 h-6 text-blue-600 mr-2" />
+        <h2 className="text-2xl font-semibold text-slate-800">Operational Context</h2>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Operating Environment
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Deployment Locations
         </label>
         <textarea
-          value={formData.operating_environment}
-          onChange={(e) => updateField('operating_environment', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={formData.deployment_locations || ''}
+          onChange={(e) => onChange('deployment_locations', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={2}
-          placeholder="e.g., Factory floor, city infrastructure, logistics network, agriculture, healthcare facility..."
+          placeholder="Indoor/outdoor, geographic distribution, etc."
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Scale Details
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Environmental Conditions
         </label>
         <textarea
-          value={formData.scale_details}
-          onChange={(e) => updateField('scale_details', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={formData.environmental_conditions || ''}
+          onChange={(e) => onChange('environmental_conditions', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={2}
-          placeholder="Number of sites, devices, assets, or users involved..."
+          placeholder="Temperature range, humidity, dust, vibration, etc."
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Physical & Environmental Conditions
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Maintenance Approach
         </label>
         <textarea
-          value={formData.environmental_conditions}
-          onChange={(e) => updateField('environmental_conditions', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={formData.maintenance_approach || ''}
+          onChange={(e) => onChange('maintenance_approach', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={2}
-          placeholder="Temperature, humidity, distance, mobility, harsh conditions..."
+          placeholder="Remote monitoring, on-site maintenance, predictive maintenance, etc."
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Asset Mobility
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Support Requirements
         </label>
-        <input
-          type="text"
-          value={formData.asset_mobility}
-          onChange={(e) => updateField('asset_mobility', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="How often do devices or assets move or change locations?"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Maintenance & Management Ownership
-        </label>
-        <input
-          type="text"
-          value={formData.maintenance_ownership}
-          onChange={(e) => updateField('maintenance_ownership', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Who will manage and maintain the system once deployed?"
+        <textarea
+          value={formData.support_requirements || ''}
+          onChange={(e) => onChange('support_requirements', e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          rows={2}
+          placeholder="24/7 support, SLA requirements, incident response, etc."
         />
       </div>
     </div>
